@@ -12,8 +12,8 @@ const int speaker = 13;
 enum game{INSTRUCTION,PROMPT,WIN,LOSE};
 game state;
 // buttonSequence of buttons to be pressed
-string buttonSequence[] = {button1,button3,button2,button0};
-string ledSequence[] = {led1,led3,led2,led0};
+char* buttonSequence[] = {button1,button3,button2,button0};
+char* ledSequence[] = {led1,led3,led2,led0};
 // game levels
 int level = 0;
 
@@ -35,7 +35,15 @@ digitalWrite(led2, LOW);
 digitalWrite(led3, LOW);
 // initialize serial monitor
 Serial.begin(9600);
+//set game to start
+state = INSTRUCTION;
 }
+
+void gameplay();
+
+void light(char* led, int duration);
+
+void lightPattern(int pattern, int reps);
 
 void loop() {
     gameplay();
@@ -47,44 +55,93 @@ void gameplay() {
     // tell player sequence to be entered
     case INSTRUCTION:
         for (int i = 0; i < level + 1; i++) {
-            digitalWrite(ledSequence[i], HIGH);
-            delay(500);
-            digitalWrite(ledSequence[i], LOW);
+            light(ledSequence[i],500);
         }
         state = PROMPT;
         break;
     // recieve input from player
     case PROMPT:
-        int i = 0;
+        char* i;
         if (digitalRead(button0) == HIGH) {
             i = button0;
+            light(led0,500);
         }
         if (digitalRead(button1) == HIGH) {
             i = button1;
+            light(led1,500);
         }
         if (digitalRead(button2) == HIGH) {
             i = button2;
+            light(led2,500);
         }
         if (digitalRead(button3) == HIGH) {
             i = button3;
+            light(led3,500);
         }
         if (i == buttonSequence[level]) {
             state = WIN;
-        } else if {
-            if (i == 0) {
+        } else if (i == 0) {
                 break;
             }
-            state = LOSE;
-            break;
-        }
+        state = LOSE;
+        break;
     // tell player they succeeded and move on to next level
-    case WIN:
-        // implement LED thing
+    case WIN: 
+        lightPattern(2,2);
+        lightPattern(0,3);
         level++;
     // tell player they lost and reset entire game
     case LOSE:
-        // implement sad LED thing
+        lightPattern(2,2);
+        lightPattern(1,3);
         level = 0;
     }
 }
 
+void light(char* led, int duration) {
+    char* note;
+        if (led0) {
+            note = "NOTE_C3"; 
+        }
+        if (led1) {
+            note = "NOTE_C4"; 
+        }
+        if (led2) {
+            note = "NOTE_C5"; 
+        }
+        if (led3) {
+            note = "NOTE_C6"; 
+        }
+    digitalWrite(led,HIGH);
+    tone(8,note,duration);
+    digitalWrite(led,LOW);
+    return;
+}
+
+void lightPattern(int pattern, int reps) {
+    if (pattern == 0) {
+        for (int i = 0; i < reps * 4; i++) {
+            light(led0,100);
+            light(led1,100);
+            light(led2,100);
+            light(led3,100);
+        }
+    }
+    if (pattern == 1) {
+        for (int i = 0; i < reps * 4; i++) {
+            light(led3,200);
+            light(led2,200);
+            light(led1,200);
+            light(led0,200);
+        } 
+    }
+    if (pattern == 2) {
+        for (int i = 0; i < reps * 4; i ++) {
+            light(led3,100);
+            light(led0,100);
+            light(led2,100);
+            light(led1,100);
+        }
+    }
+    return;
+}
