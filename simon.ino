@@ -16,8 +16,7 @@ enum game{INSTRUCTION,PROMPT,WIN,LOSE};
 game state;
 
 // buttonSequence of buttons to be pressed
-const int buttonSequence[] = {B1,B3,B2,B0};
-const int ledSequence[] = {L1,L3,L2,L0};
+const int buttonSequence[] = {B1,B3,B2,B0,B2,B1,B1,B3,B0,B2};
 
 // game levels
 int level = 0;
@@ -81,7 +80,7 @@ void gameplay() {
     case INSTRUCTION:
         Serial.println("instruction");
         for (int i = 0; i < (level + 1); i++) {
-            light(ledSequence[i],500);
+            light(buttonSequence[i] + 6,500);
         }
         sublevel = 0;
         state = PROMPT;
@@ -110,6 +109,7 @@ void gameplay() {
             light(L3,500);
             while(digitalRead(B3) == LOW) {}
         }
+        //go to beginning of switch if no button has been pressed
         if (usrB == -1) {
             break;
         }
@@ -129,9 +129,15 @@ void gameplay() {
     // tell player they succeeded and move on to next level
     case WIN: 
         Serial.println("win");
-        lightPattern(2,2);
+        lightPattern(2,3);
         lightPattern(0,3);
         level++;
+        //ends game after level 10
+        if (level >= 10) {
+            lightPattern(3,1);
+            level = 0;
+            delay(1000);
+        }
         delay(1000);
         state = INSTRUCTION;
         Serial.println("prompt");
@@ -166,7 +172,7 @@ void light(int led, int duration) {
         if (led == L3) {
             note = NOTE_C5; 
         }
-    note = note + (level * 50);
+    note = note + (level * 20);
     digitalWrite(led,HIGH);
     tone(SPKR,note,duration);
     delay(duration);
@@ -201,6 +207,18 @@ void lightPattern(int pattern, int reps) {
             light(L2,(dur/2));
             light(L1,(dur/2));
         }
+    }
+    if (pattern == 3) {
+        tone(SPKR,NOTE_C4,dur*4);
+        delay(dur*2);
+        tone(SPKR,NOTE_E4,dur*4);
+        delay(dur*2);
+        tone(SPKR,NOTE_G4,dur*4);
+        delay(dur*2);
+        tone(SPKR,NOTE_B4,dur*4);
+        delay(dur*2);
+        tone(SPKR,NOTE_C5,dur*4);
+        delay(dur*2);
     }
     return;
 }
