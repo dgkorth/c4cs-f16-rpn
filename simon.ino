@@ -140,9 +140,12 @@ void gameplay() {
     case LOSE:
         Serial.println("lose");
         level = 0;
-        lightPattern(2,2);
-        lightPattern(1,300);
-        delay(1000);
+        lightPattern(1,10);
+        delay(20); 
+        lightPattern(1,10);
+        delay(20);
+        lightPattern(1,10);
+        delay(2000);
         state = INSTRUCTION;
         break;
     }
@@ -183,7 +186,7 @@ void lightPattern(int pattern, int reps) {
         }
     }
     if (pattern == 1) {
-        dur = 10;
+        dur = 5;
         for (int i = 0; i < reps; i++) {
             light(L3,dur);
             light(L2,dur);
