@@ -23,8 +23,8 @@ const int ledSequence[] = {L1,L3,L2,L0};
 int level = 0;
 
 //varibles for PROMPT 
-int usrB;
-
+int usrB[];
+int sublevel = 0;
 
 void setup() {
 // initialize serial monitor
@@ -83,30 +83,37 @@ void gameplay() {
         for (int i = 0; i < (level + 1); i++) {
             light(ledSequence[i],500);
         }
+        sublevel = 0;
         state = PROMPT;
         Serial.println("prompt"); 
         break;
     // recieve input from player
     case PROMPT: 
-        usrB = 0;
         if (digitalRead(B0) == LOW) {
             usrB = B0;
             light(L0,500);
+            while(digitalRead(B0) == LOW) {}
         }
         if (digitalRead(B1) == LOW) {
             usrB = B1;
             light(L1,500);
+            while(digitalRead(B1) == LOW) {}
         }
         if (digitalRead(B2) == LOW) {
             usrB = B2;
             light(L2,500);
+            while(digitalRead(B2) == LOW) {}
         }
         if (digitalRead(B3) == LOW) {
             usrB = B3;
             light(L3,500);
+            while(digitalRead(B3) == LOW) {}
         }
-        if (usrB == buttonSequence[level]) {
-            state = WIN;
+        if (usrB == buttonSequence[sublevel]) {
+            sublevel++;
+            if (sublevel == (level + 1)) {
+                state = WIN;
+            }
         } 
         else if (usrB == 0) {
         }
@@ -179,10 +186,10 @@ void lightPattern(int pattern, int reps) {
     }
     if (pattern == 2) {
         for (int i = 0; i < reps; i ++) {
-            light(L3,dur);
-            light(L0,dur);
-            light(L2,dur);
-            light(L1,dur);
+            light(L3,(dur/2));
+            light(L0,(dur/2));
+            light(L2,(dur/2));
+            light(L1,(dur/2));
         }
     }
     return;
