@@ -23,7 +23,7 @@ const int ledSequence[] = {L1,L3,L2,L0};
 int level = 0;
 
 //varibles for PROMPT 
-int usrB[];
+int usrB;
 int sublevel = 0;
 
 void setup() {
@@ -89,36 +89,41 @@ void gameplay() {
         break;
     // recieve input from player
     case PROMPT: 
+        usrB = -1;
         if (digitalRead(B0) == LOW) {
             usrB = B0;
             light(L0,500);
             while(digitalRead(B0) == LOW) {}
         }
-        if (digitalRead(B1) == LOW) {
+        else if (digitalRead(B1) == LOW) {
             usrB = B1;
             light(L1,500);
             while(digitalRead(B1) == LOW) {}
         }
-        if (digitalRead(B2) == LOW) {
+        else if (digitalRead(B2) == LOW) {
             usrB = B2;
             light(L2,500);
             while(digitalRead(B2) == LOW) {}
         }
-        if (digitalRead(B3) == LOW) {
+        else if (digitalRead(B3) == LOW) {
             usrB = B3;
             light(L3,500);
             while(digitalRead(B3) == LOW) {}
+        }
+        if (usrB == -1) {
+            break;
         }
         if (usrB == buttonSequence[sublevel]) {
             sublevel++;
             if (sublevel == (level + 1)) {
                 state = WIN;
+                break;
             }
+            break;
         } 
-        else if (usrB == 0) {
-        }
-        else {
+        else  {
             state = LOSE;
+            break;
         }
         break;
     // tell player they succeeded and move on to next level
@@ -127,17 +132,17 @@ void gameplay() {
         lightPattern(2,2);
         lightPattern(0,3);
         level++;
-        delay(3000);
+        delay(1000);
         state = INSTRUCTION;
         Serial.println("prompt");
         break;
     // tell player they lost and reset entire game
     case LOSE:
         Serial.println("lose");
-        lightPattern(2,2);
-        lightPattern(1,3);
         level = 0;
-        delay(3000);
+        lightPattern(2,2);
+        lightPattern(1,300);
+        delay(1000);
         state = INSTRUCTION;
         break;
     }
@@ -147,17 +152,18 @@ void light(int led, int duration) {
     Serial.println("light");
     int note;
         if (led == L0) {
-            note = NOTE_C3; 
+            note = NOTE_C2; 
         }
         if (led == L1) {
-            note = NOTE_C4; 
+            note = NOTE_C3; 
         }
         if (led == L2) {
-            note = NOTE_C5; 
+            note = NOTE_C4; 
         }
         if (led == L3) {
-            note = NOTE_C6; 
+            note = NOTE_C5; 
         }
+    note = note + (level * 50);
     digitalWrite(led,HIGH);
     tone(SPKR,note,duration);
     delay(duration);
@@ -177,6 +183,7 @@ void lightPattern(int pattern, int reps) {
         }
     }
     if (pattern == 1) {
+        dur = 10;
         for (int i = 0; i < reps; i++) {
             light(L3,dur);
             light(L2,dur);
